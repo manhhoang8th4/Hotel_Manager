@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đăng Ký & Đăng Nhập</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Đăng Ký</h1>
+      <form id="registerForm">
+        <input type="text" name="name" placeholder="Tên" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Mật Khẩu"
+          required
+        />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Xác Nhận Mật Khẩu"
+          required
+        />
+        <input type="text" name="phone" placeholder="Số Điện Thoại" required />
+        <button type="submit">Đăng Ký</button>
+      </form>
+
+      <h1>Đăng Nhập</h1>
+      <form id="loginForm">
+        <input type="email" name="email" placeholder="Email" required />
+        <input
+          type="password"
+          name="password"
+          placeholder="Mật Khẩu"
+          required
+        />
+        <button type="submit">Đăng Nhập</button>
+      </form>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+  <script>
+    document
+      .getElementById("registerForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch("/api/user/sign-up", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+        alert(result.message);
+      });
+
+    document
+      .getElementById("loginForm")
+      .addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const data = Object.fromEntries(formData.entries());
+
+        const response = await fetch("/api/user/sign-in", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        const result = await response.json();
+
+        if (result.status === "OK") {
+          // Nếu đăng nhập thành công, chuyển hướng đến trang trangchu.html
+          window.location.href = "trangchu.html";
+        } else {
+          alert(result.message);
+        }
+      });
+  </script>
+</html>

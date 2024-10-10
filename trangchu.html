@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
+    <link rel="stylesheet" href="login.css" />
+    <title>Modern Login Page | AsmrProg</title>
+  </head>
+  <body>
+    <div class="container" id="container">
+      <!-- Form Đăng Ký -->
+      <div class="form-container sign-up">
+        <form id="registerForm">
+          <h1>Đăng Ký</h1>
+          <div class="social-icons">
+            <a href="#" class="icon"
+              ><i class="fa-brands fa-google-plus-g"></i
+            ></a>
+            <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+            <a href="#" class="icon"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </div>
+          <input type="text" id="name" placeholder="Tên" required />
+          <input type="email" id="email" placeholder="Email" required />
+          <input type="tel" id="phone" placeholder="Số điện thoại" required />
+          <input
+            type="password"
+            id="password"
+            placeholder="Mật Khẩu"
+            required
+          />
+          <input
+            type="password"
+            id="confirmPassword"
+            placeholder="Xác nhận Mật Khẩu"
+            required
+          />
+          <button type="submit">Đăng Ký</button>
+        </form>
+      </div>
+
+      <!-- Form Đăng Nhập -->
+      <div class="form-container sign-in">
+        <form id="loginForm">
+          <h1>Đăng Nhập</h1>
+          <div class="social-icons">
+            <a href="#" class="icon"
+              ><i class="fa-brands fa-google-plus-g"></i
+            ></a>
+            <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+            <a href="#" class="icon"
+              ><i class="fa-brands fa-linkedin-in"></i
+            ></a>
+          </div>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Mật Khẩu"
+            required
+          />
+          <a href="#">Quên mật khẩu?</a>
+          <button type="submit">Đăng Nhập</button>
+        </form>
+      </div>
+
+      <!-- Toggle Container -->
+      <div class="toggle-container">
+        <div class="toggle">
+          <div class="toggle-panel toggle-left">
+            <h1>Welcome Back!</h1>
+            <p>Enter your personal details to use all of site features</p>
+            <button class="hidden" id="login">Đăng Nhập</button>
+          </div>
+          <div class="toggle-panel toggle-right">
+            <h1>Hello, Friend!</h1>
+            <p>
+              Register with your personal details to use all of site features
+            </p>
+            <button class="hidden" id="register">Đăng Ký</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Chuyển đổi giữa form đăng ký và đăng nhập
+      document.getElementById("login").addEventListener("click", function () {
+        document.querySelector(".sign-in").style.display = "block";
+        document.querySelector(".sign-up").style.display = "none";
+      });
+
+      document
+        .getElementById("register")
+        .addEventListener("click", function () {
+          document.querySelector(".sign-up").style.display = "block";
+          document.querySelector(".sign-in").style.display = "none";
+        });
+
+      // Xử lý submit form đăng ký
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Ngăn không reload trang
+
+          const data = {
+            name: document.getElementById("name").value,
+            email: document.getElementById("email").value,
+            phone: document.getElementById("phone").value,
+            password: document.getElementById("password").value,
+            confirmPassword: document.getElementById("confirmPassword").value,
+          };
+
+          // Gửi request tới API đăng ký
+          fetch("http://localhost:3001/api/user/sign-up", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response.json())
+            .then((result) => {
+              if (result.status === "OK") {
+                alert("Đăng ký thành công!");
+                // Chuyển sang form đăng nhập
+                document.querySelector(".sign-in").style.display = "block";
+                document.querySelector(".sign-up").style.display = "none";
+              } else {
+                alert(result.message || "Có lỗi xảy ra!");
+              }
+            })
+            .catch((error) => {
+              console.error("Lỗi:", error);
+              alert("Lỗi kết nối server!");
+            });
+        });
+
+      // Xử lý submit form đăng nhập
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Ngăn không reload trang
+
+          const loginData = {
+            email: document.getElementById("loginEmail").value,
+            password: document.getElementById("loginPassword").value,
+          };
+
+          // Gửi request tới API đăng nhập
+          fetch("http://localhost:3001/api/user/sign-in", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(loginData),
+          })
+            .then((response) => response.json())
+            .then((result) => {
+              if (result.status === "OK") {
+                // Lưu token vào localStorage
+                localStorage.setItem("access_token", result.data.access_token);
+                localStorage.setItem(
+                  "refresh_token",
+                  result.data.refresh_token
+                );
+                alert("Đăng nhập thành công!");
+                window.location.href = "/dashboard.html"; // Điều hướng tới trang khác
+              } else {
+                alert(result.message || "Email hoặc mật khẩu không đúng!");
+              }
+            })
+            .catch((error) => {
+              console.error("Lỗi:", error);
+              alert("Lỗi kết nối server!");
+            });
+        });
+    </script>
+  </body>
+</html>
